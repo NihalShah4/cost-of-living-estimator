@@ -106,3 +106,36 @@ def estimate_monthly_cost(i: Inputs, rpp_index: float) -> Dict[str, float]:
     }
     out["Total"] = sum(out.values())
     return out
+def recommend_income(monthly_cost: float, savings_rate: float, effective_tax_rate: float, buffer: float = 0.0) -> dict:
+    """
+    Computes gross income needed to cover:
+      - monthly_cost (expenses)
+      - savings_rate (as % of net income)
+      - effective_tax_rate (as % of gross income)
+      - optional buffer on costs (e.g., 0.05 => +5%)
+
+    Model:
+      gross_income * (1 - tax_rate) = net_income
+      net_income = expenses_adjusted + savings_rate * net_income
+      => net_income * (1 - savings_rate) = expenses_adjusted
+      => net_income = expenses_adjusted / (1 - savings_rate)
+      => gross = net_income / (1 - tax_rate)
+    """
+    expenses_adjusted = monthly_cost * (1.0 + max(buffer, 0.0))
+
+    # Guardrails
+    savings_rate = min(max(savings_rate, 0.0), 0.80)
+    effective_tax_rate = min(max(effective_tax_rate, 0.0), 0.60)
+
+    if savings_rate >= 1.0:
+        raise ValueError("Savings rate must be < 100%.")
+
+    net_needed = expenses_adjusted / (1.0 - savings_rate)
+    gross_needed = net_needed / (1.0 - effective_tax_rate) if effective_tax_rate < 1.0 else float("inf")
+
+    return {
+        "expenses_adjusted": expenses_adjusted,
+        "net_monthly": net_needed,
+        "gross_monthly": gross_needed,
+        "gross_annual": gross_needed * 12
+    }
