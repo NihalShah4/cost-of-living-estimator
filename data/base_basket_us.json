@@ -1,0 +1,17 @@
+{
+  "baseline_year_note": "Heuristic national-average baseline. Adjust as desired.",
+  "monthly_usd_single_adult": {
+    "housing_1br": 1600,
+    "utilities": 220,
+    "groceries": 450,
+    "transport_base": 280,
+    "healthcare": 320,
+    "misc": 350,
+    "dining_out_base": 220
+  },
+  "child_monthly": {
+    "groceries_per_child": 160,
+    "healthcare_per_child": 60,
+    "childcare_per_child": 900
+  }
+}
